@@ -1,0 +1,8 @@
+argv = ['./waf', 'distclean', 'configure', 'clean', 'build', '-v']
+environ = {'DOTCLOUD_CONFIG_FILE': '~/.dotcloud/dotcloud.conf', 'SSH_AUTH_SOCK': '/tmp/launch-iPu3fy/Listeners', 'VERSIONER_PYTHON_PREFER_32_BIT': 'no', 'VIRTUAL_ENV': '/Users/rammehta/src/machine/env', 'SHELL': '/bin/bash', 'LOGNAME': 'rammehta', 'USER': 'rammehta', 'HOME': '/Users/rammehta', 'ITERM_PROFILE': 'Default', 'PATH': '/Users/rammehta/src/machine/env/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/Users/rammehta/src/java/android-sdk-macosx/platform-tools:/Users/rammehta/src/java/android-sdk-macosx/tools:/Users/rammehta/src/differential/arcanist/bin', 'PS1': '(env)\\[\\033[0;31m\\]$(date +%H:%M) \\w\\[\\033[0;33m\\] $(parse_git_branch)\\[\\033[0;32m\\]$ ', '_': './waf', 'TERM_PROGRAM': 'iTerm.app', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm', 'Apple_PubSub_Socket_Render': '/tmp/launch-Uyw8iT/Render', 'VERSIONER_PYTHON_VERSION': '2.7', 'SHLVL': '1', 'OLDPWD': '/Users/rammehta/src/machine', 'PWD': '/Users/rammehta/src/machine/src', '__CF_USER_TEXT_ENCODING': '0x1F5:0:0', 'Apple_Ubiquity_Message': '/tmp/launch-Bzo0NV/Apple_Ubiquity_Message', 'ITERM_SESSION_ID': 'w0t1p0', 'TMPDIR': '/var/folders/r6/8pcqz_nd7c90xm2h9sflx9nh0000gn/T/', 'COMMAND_MODE': 'unix2003'}
+files = ['/Users/rammehta/src/machine/src/wscript']
+hash = 4372240532504331849
+options = {'files': '', 'jobs': 8, 'verbose': 1, 'nocache': False, 'progress_bar': 0, 'top': '', 'destdir': '', 'keep': 0, 'zones': '', 'prefix': '/usr/local/', 'download': False, 'force': False, 'distcheck_args': None, 'targets': '', 'out': ''}
+out_dir = '/Users/rammehta/src/machine/env'
+run_dir = '/Users/rammehta/src/machine/src'
+top_dir = '/Users/rammehta/src/machine/src'
