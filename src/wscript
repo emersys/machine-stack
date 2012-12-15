@@ -126,7 +126,7 @@ def build(ctx):
         source="bin/pkg-config", target="bin/freetype-config")
 
     ctx(rule=build_module("zeromq-3.2.2"),
-        source="bin/pkg-config", target="lib/libzmq.so")
+        source="bin/pkg-config", target="lib/libzmq.dylib")
 
     qt_configure_flags = ("-opensource -fast -no-qt3support -no-phonon "
         "-no-declarative -no-openssl -no-cups -no-iconv -no-dbus "
@@ -145,14 +145,14 @@ def build(ctx):
     numpy = os.path.join(site_packages, "numpy", "__init__.py")
     ctx(rule=venv("pip install numpy==1.6.2"), source="bin/pkg-config", target=numpy)
 
-    ctx(rule=venv("pip install -r requirements.txt && touch ${TGT}"),
+    ctx(rule=venv("pip install -r ../src/requirements.txt && touch ${TGT}"),
         source=[
             numpy,
             "bin/gfortran",
             "bin/freetype-config",
             "bin/libpng-config",
             "bin/qmake",
-            "lib/libzmq.so"],
+            "lib/libzmq.dylib"],
         target=".requirements-done")
     ctx.add_manual_dependency(".requirements-done", ctx.path.find_resource("requirements.txt"))
     ctx(rule=build_mathjax, source=".requirements-done", target=".mathjax-done")
