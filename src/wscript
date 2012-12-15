@@ -96,7 +96,7 @@ def build_gfortran(target):
 
     for f in os.listdir(manpath):
         if f not in manfiles and not "gfortran" in f:
-            os.unlink(os.path.join(binpath, f))
+            os.unlink(os.path.join(manpath, f))
 
 
 def build_mathjax(target):
