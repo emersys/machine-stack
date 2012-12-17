@@ -1,0 +1,14 @@
+*.egg-info
+*.pyc
+/scripts/figures
+*~
+*.swp
+*.orig
+*.tmp
+*.pid
+*.db
+*#
+.DS_Store
+.lock*
+.waf-*
+env/*

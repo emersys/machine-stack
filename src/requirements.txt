@@ -1,9 +1,10 @@
 # cvxopt==1.1.5
-nose==1.2.1
+ipython==0.13.1
 matplotlib==1.2.0
 mpmath==0.17
+nose==1.2.1
 pygments==1.5
-pyside==1.1.2
+# pyside==1.1.2
 pyzmq==2.2.0.1
 scipy==0.11.0
 sympy==0.7.2

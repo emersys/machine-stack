@@ -11,7 +11,8 @@ VERSION = "0.2"
 
 top = "."
 out = "../env"
-
+src = os.path.abspath(".")
+pkg = os.path.join(os.path.abspath("."), "3rdparty", "site-packages")
 
 def configure(ctx):
     print("→ configuring the project in " + ctx.path.abspath())
@@ -137,22 +138,25 @@ def build(ctx):
 
     ctx(rule=build_gfortran, source="bin/pkg-config", target="bin/gfortran")
 
-    ctx(rule=venv("easy_install readline==6.2.4.1 && easy_install ipython==0.13.1"),
-        source="bin/pkg-config", target="bin/ipython")
+    ctx(rule=venv("easy_install --no-find-links %s/readline-6.2.4.1.tar.gz && touch ${TGT}" % pkg),
+        source="bin/pkg-config", target=".readline-done")
 
     # Install numpy separately, due to bug in scipy install script.
     site_packages = os.path.join("lib", "python2.7", "site-packages")
     numpy = os.path.join(site_packages, "numpy", "__init__.py")
-    ctx(rule=venv("pip install numpy==1.6.2"), source="bin/pkg-config", target=numpy)
+    ctx(rule=venv("pip install -b ../src/site-packages numpy==1.6.2"),
+        source="bin/pkg-config", target=numpy)
 
-    ctx(rule=venv("pip install -r ../src/requirements.txt && touch ${TGT}"),
+    ctx(rule=venv("pip install --no-index -f file://%s -r %s/requirements.txt && touch ${TGT}" % (
+            pkg, src)),
         source=[
             numpy,
             "bin/gfortran",
             "bin/freetype-config",
             "bin/libpng-config",
             "bin/qmake",
-            "lib/libzmq.dylib"],
+            "lib/libzmq.dylib",
+            ".readline-done"],
         target=".requirements-done")
     ctx.add_manual_dependency(".requirements-done", ctx.path.find_resource("requirements.txt"))
     ctx(rule=build_mathjax, source=".requirements-done", target=".mathjax-done")
