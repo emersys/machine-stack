@@ -1,4 +1,7 @@
-Sets up a python virtualenv with numpy/scipy/ipython/matplotlib installed.
+Machine-Stack
+============
+Sets up a python virtualenv with various scientific packages.
+Includes: numpy, scipy, ipython, matplotlib
 
 
 Requirements
@@ -15,6 +18,7 @@ It can be named anything. The top level of the repo must include a wscript file
 which should look something like:
 
 
+```python
 APPNAME = <APPNAME>
 VERSION = <VERSION>
 
@@ -32,3 +36,4 @@ def configure(ctx):
 
 def build(ctx):
     ctx.recurse("src")
+```
