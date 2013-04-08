@@ -16,7 +16,7 @@ def venv(ctx, cmd):
 
 @conf
 def venv_exec(ctx, srcscript, log=False):
-    ctx.start_msg("→ Executing script in python virtualenv...")
+    ctx.start_msg("venv.")
     srcscript = [
         "#!/bin/bash"
         "set -eu",
@@ -35,5 +35,5 @@ def venv_exec(ctx, srcscript, log=False):
     finally:
         os.unlink(f.name)
 
-    ctx.end_msg("→ Done executing script in virtualenv.")
+    ctx.end_msg("→ venv Done.")
     return ret
