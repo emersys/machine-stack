@@ -41,5 +41,5 @@ def build(ctx):
 To build the stack, run the following command from the top level of the repo.
 
 ```
-src/wscript configure clean build
+$ src/waf configure clean build
 ```
