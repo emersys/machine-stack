@@ -11,7 +11,8 @@ print("→ loading the venv tool")
 
 @conf
 def venv(ctx, cmd):
-    return "(source bin/activate && DYLD_LIBRARY_PATH=$VIRTUAL_ENV %s)" % cmd
+    activate = os.path.join(ctx.out_dir, "bin", "activate")
+    return "(. %s && DYLD_LIBRARY_PATH=$VIRTUAL_ENV %s)" % (activate, cmd)
 
 
 @conf
