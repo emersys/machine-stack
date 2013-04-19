@@ -2,6 +2,7 @@
 # encoding: utf-8
 import os
 import shutil
+import sys
 import tarfile
 
 from waflib.Configure import conf
@@ -105,6 +106,28 @@ def build_mathjax(ctx, target):
 
 
 @conf
+def build_blas(ctx, target):
+    srcpath = ctx.env.SRCPATH
+    libpath = os.path.join(ctx.out_dir, "lib")
+    srcscript = """
+        set -e
+        base="blas"
+        pushd %(srcpath)s/3rdparty
+        rm -fr BLAS
+        tar -xzf "$base.tgz"
+        pushd BLAS
+        gfortran -shared -O2 *.f -o libblas.so -fPIC
+        gfortran -O2 -c *.f
+        ar cr libblas.a *.o
+        cp libblas.a libblas.so %(libpath)s
+        popd
+        rm -fr BLAS
+        popd
+    """ % locals()
+    ctx.venv_exec(srcscript)
+
+
+@conf
 def build_cvxopt(ctx, target):
     srcpath = ctx.env.SRCPATH
     module = "cvxopt-1.1.5"
@@ -131,9 +154,22 @@ def build(ctx):
         source="../bin/activate", target="../bin/pkg-config")
 
     ctx.module("libpng-1.5.13", source="../bin/pkg-config", target="../bin/libpng-config")
-    ctx.module("zeromq-3.2.2", source="../bin/pkg-config", target="../lib/libzmq.dylib")
+    ctx.module("zeromq-3.2.2", source="../bin/pkg-config", target="../lib/libzmq.a")
     ctx(rule=ctx.build_freetype2, source="../bin/pkg-config", target="../bin/freetype-config")
-    ctx(rule=ctx.build_gfortran, source="../bin/pkg-config", target="../bin/gfortran")
+
+    pkg = os.path.join(ctx.path.abspath(), "3rdparty", "site-packages")
+    if sys.platform == "darwin":
+        ctx(rule=ctx.build_gfortran, source="../bin/pkg-config", target="../bin/gfortran")
+        readlinetar = "%s/readline-6.2.4.1.tar.gz" % pkg
+        readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
+        ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
+        platform_deps = ["../bin/gfortran", "../.readline-done"]
+    else:
+        # We assume that a fortran compiler with lapack is installed.
+        # It may be installed using:
+        # sudo apt-get install liblapack-dev gfortran
+        ctx(rule=ctx.build_blas, source="../bin/pkg-config", target="../lib/libblas.a")
+        platform_deps = ["../lib/libblas.a"]
 
     # qt_configure_flags = (
     #     "-opensource -fast -no-qt3support -no-phonon "
@@ -144,15 +180,11 @@ def build(ctx):
     #     "qt-everywhere-opensource-src-4.8.4", qt_configure_flags, 1,
     #     source="../bin/pkg-config", target="../bin/qmake")
 
-    pkg = os.path.join(ctx.path.abspath(), "3rdparty", "site-packages")
-    readlinetar = "%s/readline-6.2.4.1.tar.gz" % pkg
-    readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
-    ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
-
     # Install numpy separately due to bug in scipy install script.
     site_packages = os.path.join("..", "lib", "python2.7", "site-packages")
     numpy = os.path.join(site_packages, "numpy", "__init__.py")
-    ctx(rule=ctx.venv("pip install numpy==1.6.2"), source="../bin/pkg-config", target=numpy)
+    ctx(rule=ctx.venv("pip install numpy==1.6.2 --no-index -f file://%s" % pkg),
+        source="../bin/pkg-config", target=numpy)
 
     # Install cvxopt separately due to misplaced setup.py file.
     cvxopt = os.path.join(site_packages, "cvxopt", "__init__.py")
@@ -163,13 +195,11 @@ def build(ctx):
         rule=ctx.venv("pip install --no-index -f file://%s -r %s && touch ${TGT}" % (pkg, reqs)),
         source=[
             numpy,
-            "../bin/gfortran",
             "../bin/freetype-config",
             "../bin/libpng-config",
             # "../bin/qmake",
-            "../lib/libzmq.dylib",
-            "../.readline-done"
-        ],
+            "../lib/libzmq.a",
+        ] + platform_deps,
         target="../.requirements-done")
 
     ctx.add_manual_dependency("../.requirements-done", reqs)
