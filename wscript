@@ -184,7 +184,7 @@ def build(ctx):
     site_packages = os.path.join("..", "lib", "python2.7", "site-packages")
     numpy = os.path.join(site_packages, "numpy", "__init__.py")
     ctx(rule=ctx.venv("pip install numpy==1.6.2 --no-index -f file://%s" % pkg),
-        source="../bin/pkg-config", target=numpy)
+        source=platform_deps, target=numpy)
 
     # Install cvxopt separately due to misplaced setup.py file.
     cvxopt = os.path.join(site_packages, "cvxopt", "__init__.py")
