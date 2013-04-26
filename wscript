@@ -27,10 +27,6 @@ def build(ctx):
     ctx.module("libpng-1.5.13", source="../bin/pkg-config", target="../bin/libpng-config")
     ctx.module("zeromq-3.2.2", source="../bin/pkg-config", target="../lib/libzmq.a")
     ctx(rule=ctx.build_freetype2, source="../bin/pkg-config", target="../bin/freetype-config")
-    ctx(rule=ctx.build_hbase, source="../bin/pkg-config", target="../hbase/bin/start-hbase.sh")
-    # ctx.module("apache-couchdb-1.3.0", source="../bin/pkg-config", target="../bin/couchdb")
-    # ctx(rule=ctx.build_mongo, source="../bin/pkg-config", target="../bin/mongod")
-    # ctx(rule=ctx.build_scons, source="../bin/pkg-config", target="../bin/scons")
 
     pkg = os.path.join(ctx.path.abspath(), "3rdparty", "site-packages")
     if sys.platform == "darwin":
