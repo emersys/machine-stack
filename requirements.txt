@@ -1,6 +1,5 @@
 flake8==2.0
 Imaging==1.1.7
-ipython==0.13.1
 matplotlib==1.2.0
 mccabe==0.2
 mpmath==0.17
