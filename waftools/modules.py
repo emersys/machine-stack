@@ -39,7 +39,8 @@ def build_freetype2(ctx, target):
     includepath = os.path.join(ctx.out_dir, "include")
     srcpath = os.path.join(includepath, "ft2build.h")
     dstpath = os.path.join(includepath, "freetype2", "ft2build.h")
-    os.symlink(srcpath, dstpath)
+    if not os.path.exists(dstpath):
+        os.symlink(srcpath, dstpath)
 
 
 @conf

@@ -79,5 +79,5 @@ def build(ctx):
         ],
         target="../.requirements-done")
 
-    ctx.add_manual_dependency(reqs, "../.requirements-done")
+    ctx.add_manual_dependency("../.requirements-done", ctx.path.find_node("requirements.txt"))
     ctx(rule="touch ${TGT}", source="../.requirements-done", target="../../.build-done")
