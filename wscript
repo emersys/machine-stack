@@ -62,7 +62,12 @@ def build(ctx):
     ctx(rule=ctx.build_cvxopt, source=numpy, target=cvxopt)
 
     # Install iPython separately from requirements in order to build mathjax.
-    ctx(rule=ctx.pip_install("ipython==0.13.1"), source=numpy, target="../bin/ipython")
+    reqs_ipython = "%s/requirements-ipython.txt" % ctx.path.abspath()
+    ctx(
+        rule=ctx.venv("pip install --no-index -f file://%s -r %s" % (pkg, reqs_ipython)),
+        source=platform_deps + [numpy],
+        target="../bin/ipython")
+    ctx.add_manual_dependency("../bin/ipython", ctx.path.find_node("requirements-ipython.txt"))
     ctx(rule=ctx.build_mathjax, source="../bin/ipython", target="../.mathjax-done")
 
     reqs = "%s/requirements.txt" % ctx.path.abspath()
@@ -78,6 +83,5 @@ def build(ctx):
             "../lib/libzmq.a",
         ],
         target="../.requirements-done")
-
     ctx.add_manual_dependency("../.requirements-done", ctx.path.find_node("requirements.txt"))
     ctx(rule="touch ${TGT}", source="../.requirements-done", target="../../.build-done")

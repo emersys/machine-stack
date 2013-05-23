@@ -7,11 +7,7 @@ mpmath==0.17
 nose==1.2.1
 pep8==1.4.5
 pyflakes==0.6.1
-pygments==1.6
 # pyside==1.1.2
-pyzmq==2.2.0.1
 scikit-learn==0.13.1
 scipy==0.11.0
 sympy==0.7.2
-tornado==2.4.1
-

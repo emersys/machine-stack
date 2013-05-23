@@ -1,0 +1,4 @@
+pygments==1.6
+pyzmq==2.2.0.1
+tornado==2.4.1
+ipython==0.13.1
