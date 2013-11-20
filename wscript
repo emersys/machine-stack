@@ -32,7 +32,9 @@ def build(ctx):
         ctx(rule=ctx.build_gfortran, source="../bin/pkg-config", target="../bin/gfortran")
         platform_deps = ["../bin/gfortran"]
 
-        if platform.mac_ver()[0] < "10.9":
+        xcode_version_cmd = "xcodebuild -version | head -1 | cut -f2 -d\ "
+        xcode_version = subprocess.check_output(xcode_version_cmd, shell=True).strip()
+        if xcode_version < "5.0":
             readlinetar = "%s/readline-6.2.4.1.tar.gz" % pkg
             readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
             ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
