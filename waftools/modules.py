@@ -8,6 +8,31 @@ from waflib.Configure import conf
 
 
 @conf
+def template_renderer(ctx, srcpath, dstpath, format=True, executable=False):
+    print format
+    kwargs = {"VIRTUAL_ENV": ctx.out_dir}
+    kwargs.update(os.environ)
+    dstpath = os.path.join(ctx.out_dir, dstpath)
+    with open(srcpath, "r") as src:
+        value = src.read()
+    with open(dstpath, "w") as dst:
+        dst.write(value.format(**kwargs) if format else (value % kwargs))
+
+    if executable:
+        ctx.venv_exec("chmod +x %s" % dstpath)
+
+
+@conf
+def template(ctx, srcpath, **kwargs):
+    fmt = kwargs.pop("format", True)
+    exe = kwargs.pop("executable", False)
+    tgtpath = kwargs.get("target")
+    rule = ctx(rule=lambda target: ctx.template_renderer(srcpath, tgtpath, fmt, exe), **kwargs)
+    ctx.add_manual_dependency(tgtpath, ctx.path.find_node(srcpath))
+    return rule
+
+
+@conf
 def module_builder(ctx, module, configure="", numthreads=4):
     srcpath = ctx.env.SRCPATH
     return """
@@ -81,6 +106,30 @@ def build_gfortran(ctx, target):
 
 
 @conf
+def build_postgresql(ctx, target):
+    module = "postgresql-9.2.4"
+    srcpath = ctx.env.SRCPATH
+    srcscript = """
+        set -e
+        base="%(module)s"
+        pushd %(srcpath)s/3rdparty
+        rm -fr "$base"
+        tar xzf "$base.tar.gz"
+        pushd "$base"
+        ./configure --prefix=$VIRTUAL_ENV
+        make
+        make install
+        pushd contrib/hstore
+        make install
+        popd
+        popd
+        rm -fr "$base"
+        popd
+    """ % locals()
+    ctx.venv_exec(srcscript)
+
+
+@conf
 def build_mathjax(ctx, target):
     cmd = "from IPython.frontend.html import notebook; print notebook.__file__"
     nbfile = ctx.venv_exec("echo \"%s\" | python" % cmd, log=True)
@@ -89,6 +138,9 @@ def build_mathjax(ctx, target):
     tar = tarfile.open(name=tarpath, mode="r:gz")
     topdir = tar.firstmember.path
     tar.extractall(static)
+    if os.path.exists(os.path.join(static, "mathjax")):
+        shutil.rmtree(os.path.join(static, "mathjax"))
+
     ctx.cmd_and_log("mv -f %s %s && touch %s" % (
         os.path.join(static, topdir),
         os.path.join(static, "mathjax"),
@@ -131,6 +183,27 @@ def build_scons(ctx, target):
         python setup.py install
         popd
         rm -fr "$base"
+        popd
+    """ % locals()
+    ctx.venv_exec(srcscript)
+
+
+@conf
+def build_redis(ctx, target):
+    module = "redis-2.6.14"
+    srcpath = ctx.env.SRCPATH
+    srcscript = """
+        set -e
+        base="%(module)s"
+        pushd %(srcpath)s/3rdparty
+        rm -fr "$base"
+        tar -xzf "$base.tar.gz"
+        pushd "$base"
+        make
+        cp src/redis-cli src/redis-server $VIRTUAL_ENV/bin
+        popd
+        rm -fr "$base"
+        mkdir -p "$VIRTUAL_ENV/redis"
         popd
     """ % locals()
     ctx.venv_exec(srcscript)

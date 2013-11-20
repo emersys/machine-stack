@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 # encoding: utf-8
 import os
+import platform
 import sys
 
 
@@ -19,22 +20,23 @@ def configure(ctx):
 
 
 def build(ctx):
-    ctx(rule="virtualenv --distribute .", target="../bin/activate")
     ctx.module(
         "pkg-config-0.27.1", "--disable-debug --with-internal-glib",
         source="../bin/activate", target="../bin/pkg-config")
 
     ctx.module("libpng-1.5.13", source="../bin/pkg-config", target="../bin/libpng-config")
     ctx.module("zeromq-3.2.2", source="../bin/pkg-config", target="../lib/libzmq.a")
-    ctx(rule=ctx.build_freetype2, source="../bin/pkg-config", target="../bin/freetype-config")
 
     pkg = os.path.join(ctx.path.abspath(), "3rdparty", "site-packages")
     if sys.platform == "darwin":
         ctx(rule=ctx.build_gfortran, source="../bin/pkg-config", target="../bin/gfortran")
-        readlinetar = "%s/readline-6.2.4.1.tar.gz" % pkg
-        readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
-        ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
-        platform_deps = ["../bin/gfortran", "../.readline-done"]
+        platform_deps = ["../bin/gfortran"]
+
+        if platform.mac_ver()[0] < "10.9":
+            readlinetar = "%s/readline-6.2.4.1.tar.gz" % pkg
+            readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
+            ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
+            platform_deps.append("../.readline-done")
     else:
         # We assume that a fortran compiler with lapack is installed.
         # It may be installed using:
@@ -78,7 +80,6 @@ def build(ctx):
             # "../bin/qmake",
             "../.mathjax-done",
             "../bin/ipython",
-            "../bin/freetype-config",
             "../bin/libpng-config",
             "../lib/libzmq.a",
         ],
