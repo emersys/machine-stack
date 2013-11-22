@@ -57,6 +57,15 @@ def module(ctx, module, configure="", numthreads=4, **kwargs):
 
 
 @conf
+def symlink_freetype(ctx, target):
+    includepath = os.path.join(ctx.out_dir, "include")
+    srcpath = "/usr/X11/include/freetype2/freetype"
+    dstpath = os.path.join(includepath, "freetype")
+    if not os.path.exists(dstpath):
+        os.symlink(srcpath, dstpath)
+
+
+@conf
 def build_freetype2(ctx, target):
     srcscript = ctx.module_builder("freetype-2.1.10")
     ctx.venv_exec(srcscript)

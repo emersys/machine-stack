@@ -2,6 +2,7 @@
 # encoding: utf-8
 import os
 import platform
+import subprocess
 import sys
 
 
@@ -39,6 +40,7 @@ def build(ctx):
             readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
             ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
             platform_deps.append("../.readline-done")
+
     else:
         # We assume that a fortran compiler with lapack is installed.
         # It may be installed using:
@@ -58,8 +60,11 @@ def build(ctx):
     # Install numpy separately due to bug in scipy install script.
     site_packages = os.path.join("..", "lib", "python2.7", "site-packages")
     numpy = os.path.join(site_packages, "numpy", "__init__.py")
-    ctx(rule=ctx.venv("pip install numpy==1.6.2 --no-index -f file://%s" % pkg),
+    ctx(rule=ctx.venv("pip install numpy==1.8.0 --no-index -f file://%s" % pkg),
         source=platform_deps, target=numpy)
+
+    # pycuda = os.path.join(site_packages, "pycuda", "__init__.py")
+    # ctx.module("pycuda-2013.1.1", source=numpy, target="../lib/libzmq.a")
 
     # Install cvxopt separately due to misplaced setup.py file.
     cvxopt = os.path.join(site_packages, "cvxopt", "__init__.py")
@@ -87,4 +92,3 @@ def build(ctx):
         ],
         target="../.requirements-done")
     ctx.add_manual_dependency("../.requirements-done", ctx.path.find_node("requirements.txt"))
-    ctx(rule="touch ${TGT}", source="../.requirements-done", target="../../.build-done")
