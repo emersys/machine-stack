@@ -30,12 +30,13 @@ def build(ctx):
 
     pkg = os.path.join(ctx.path.abspath(), "3rdparty", "site-packages")
     if sys.platform == "darwin":
+        ctx(rule=ctx.build_freetype2, source="../bin/pkg-config", target="../bin/freetype-config")
         ctx(rule=ctx.build_gfortran, source="../bin/pkg-config", target="../bin/gfortran")
-        platform_deps = ["../bin/gfortran"]
+        platform_deps = ["../bin/freetype-config", "../bin/gfortran"]
 
         if platform.mac_ver()[0] < "10.9":
             readlinetar = "%s/readline-6.2.4.1.tar.gz" % pkg
-            readlinecmd = ctx.venv("easy_install --no-find-links %s && touch ${TGT}" % readlinetar)
+            readlinecmd = ctx.venv("easy_install %s && touch ${TGT}" % readlinetar)
             ctx(rule=readlinecmd, source="../bin/pkg-config", target="../.readline-done")
             platform_deps.append("../.readline-done")
 
@@ -75,7 +76,8 @@ def build(ctx):
         source=platform_deps + [numpy],
         target="../bin/ipython")
     ctx.add_manual_dependency("../bin/ipython", ctx.path.find_node("requirements-ipython.txt"))
-    ctx(rule=ctx.build_mathjax, source="../bin/ipython", target="../.mathjax-done")
+    # Disable until we figure out how to install this for IPython >= 1.1.0
+    # ctx(rule=ctx.build_mathjax, source="../bin/ipython", target="../.mathjax-done")
 
     reqs = "%s/requirements.txt" % ctx.path.abspath()
     ctx(
@@ -83,7 +85,7 @@ def build(ctx):
         source=platform_deps + [
             numpy,
             # "../bin/qmake",
-            "../.mathjax-done",
+            # "../.mathjax-done",
             "../bin/ipython",
             "../bin/libpng-config",
             "../lib/libzmq.a",
