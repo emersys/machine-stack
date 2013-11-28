@@ -47,15 +47,6 @@ def build(ctx):
         ctx(rule=ctx.build_blas, source="../bin/pkg-config", target="../lib/libblas.a")
         platform_deps = ["../lib/libblas.a"]
 
-    # qt_configure_flags = (
-    #     "-opensource -fast -no-qt3support -no-phonon "
-    #     "-no-declarative -no-openssl -no-cups -no-iconv -no-dbus "
-    #     "-no-nis --confirm-license=yes")
-    #
-    # ctx.module(
-    #     "qt-everywhere-opensource-src-4.8.4", qt_configure_flags, 1,
-    #     source="../bin/pkg-config", target="../bin/qmake")
-
     # Install numpy separately due to bug in scipy install script.
     site_packages = os.path.join("..", "lib", "python2.7", "site-packages")
     numpy = os.path.join(site_packages, "numpy", "__init__.py")
@@ -77,15 +68,14 @@ def build(ctx):
         target="../bin/ipython")
     ctx.add_manual_dependency("../bin/ipython", ctx.path.find_node("requirements-ipython.txt"))
     # Disable until we figure out how to install this for IPython >= 1.1.0
-    # ctx(rule=ctx.build_mathjax, source="../bin/ipython", target="../.mathjax-done")
+    ctx(rule=ctx.build_mathjax, source="../bin/ipython", target="../.mathjax-done")
 
     reqs = "%s/requirements.txt" % ctx.path.abspath()
     ctx(
         rule=ctx.venv("pip install --no-index -f file://%s -r %s && touch ${TGT}" % (pkg, reqs)),
         source=platform_deps + [
             numpy,
-            # "../bin/qmake",
-            # "../.mathjax-done",
+            "../.mathjax-done",
             "../bin/ipython",
             "../bin/libpng-config",
             "../lib/libzmq.a",

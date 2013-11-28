@@ -140,20 +140,9 @@ def build_postgresql(ctx, target):
 
 @conf
 def build_mathjax(ctx, target):
-    cmd = "from IPython.frontend.html import notebook; print notebook.__file__"
-    nbfile = ctx.venv_exec("echo \"%s\" | python" % cmd, log=True)
-    static = os.path.join(os.path.dirname(nbfile), "static")
     tarpath = os.path.join(ctx.env.SRCPATH, "3rdparty", "mathjax-1.1.0.tar.gz")
-    tar = tarfile.open(name=tarpath, mode="r:gz")
-    topdir = tar.firstmember.path
-    tar.extractall(static)
-    if os.path.exists(os.path.join(static, "mathjax")):
-        shutil.rmtree(os.path.join(static, "mathjax"))
-
-    ctx.cmd_and_log("mv -f %s %s && touch %s" % (
-        os.path.join(static, topdir),
-        os.path.join(static, "mathjax"),
-        os.path.join(ctx.out_dir, ".mathjax-done")))
+    touchpath = os.path.join(ctx.out_dir, ".mathjax-done")
+    ctx.venv_exec("python -m IPython.external.mathjax %s && touch %s" % (tarpath, touchpath))
 
 
 @conf
