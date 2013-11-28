@@ -2,7 +2,6 @@
 # encoding: utf-8
 import os
 import shutil
-import tarfile
 
 from waflib.Configure import conf
 
